@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  #mariadb
+  mariadb:
+    image: mariadb
+    environment:
+      MARIADB_USER: example-user
+      MARIADB_PASSWORD: my_cool_secret
+      MARIADB_ROOT_PASSWORD: my-secret-pw
+    restart: always
+    volumes:
+     - /var/lib/mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+  
+  #redis
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    restart: always
+
+  #phpmyadmin    
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+      - UPLOAD_LIMIT=12000000
+  #mongo
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
