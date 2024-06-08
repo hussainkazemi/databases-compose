@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.9'
 
 services:
   #mariadb
@@ -9,34 +9,76 @@ services:
       MARIADB_PASSWORD: my_cool_secret
       MARIADB_ROOT_PASSWORD: my-secret-pw
     restart: always
+    # container_name: my-mariadb
     volumes:
      - /var/lib/mysql:/var/lib/mysql
     ports:
       - 3306:3306
+
   
   #redis
-  redis:
+  redisdb:
     image: redis
     ports:
       - 6379:6379
     restart: always
+    volumes:
+      - ./data:/data
+    # container_name: my-redis
+    # command: ["redis-server", "--bind", "redisdb", "--port", "6379"]
+
+#  postgres
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    # container_name: my-postgres
+    #  set shared memory limit when using docker-compose
+    shm_size: 128mb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=pstgrs_db
+    # volumes:
+    #   - db:/var/lib/postgresql/data 
 
   #phpmyadmin    
   phpmyadmin:
     image: phpmyadmin
     restart: always
+    # container_name: my-phpmyadmin
     ports:
-      - 8080:80
+      - 8088:80
     environment:
       - PMA_ARBITRARY=1
       - UPLOAD_LIMIT=12000000
   #mongo
-  mongo:
-    image: mongo
+  # mongo:
+  #   image: mongo
+  #   restart: always
+  #   ports:
+  #     - 27017:27017
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+  
+  adminer:
+    image: adminer
     restart: always
     ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      - 8080:8080
 
+
+networks:
+    redis-network:
+        driver: bridge
+    nats:
+        name: nats
+    rabbitmq_go_net:
+        driver: bridge
+    network:
+        driver: bridge
+
+volumes:
+  db:
